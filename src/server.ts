@@ -1,13 +1,13 @@
 import { app } from './app.ts';
+import { env } from './config/env.ts';
 
 const start = async () => {
   try {
     await app.listen({
-      port: Number(process.env.PORT ?? 3000),
-      host: process.env.HOST ?? '0.0.0.0',
+      port: env.PORT,
+      host: env.HOST,
     });
   } catch (error) {
-    0.0;
     app.log.error(error);
     process.exit(1);
   }

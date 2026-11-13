@@ -6,6 +6,13 @@ export const app = Fastify({
   logger: true,
 });
 
+app.get('/', async () => {
+  return {
+    status: 'ok',
+    service: 'Hello from TRIMLY',
+  };
+});
+
 app.get('/health', async () => {
   return {
     status: 'ok',
