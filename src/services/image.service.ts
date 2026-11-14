@@ -1,5 +1,8 @@
 import sharp, { type Metadata } from 'sharp';
-import { imageFormatSchema } from '../schemas/image.schema.ts';
+import {
+  imageFormatSchema,
+  type ResizeOptions,
+} from '../schemas/image.schema.ts';
 import { env } from '../config/env.ts';
 
 export class ImageValidationError extends Error {
@@ -48,4 +51,16 @@ export async function inspectImage(buffer: Buffer) {
     height: metadata.height,
     size: buffer.length,
   };
+}
+
+export async function resizeImage(buffer: Buffer, options: ResizeOptions) {
+  return sharp(buffer)
+    .resize({
+      width: options.width,
+      height: options.height,
+      fit: options.fit,
+      withoutEnlargement: options.withoutEnlargement,
+    })
+    .webp()
+    .toBuffer();
 }

@@ -1,7 +1,8 @@
-import Fastify from 'fastify';
+import Fastify, { type FastifyError } from 'fastify';
 import multipart from '@fastify/multipart';
 import { env } from './config/env.ts';
 import imageRoutes from './routes/image.route.ts';
+import { ImageValidationError } from './services/image.service.ts';
 
 const PORT = process.env.PORT || 3000;
 
@@ -24,6 +25,25 @@ app.get('/health', async () => {
 });
 await app.register(imageRoutes, {
   prefix: '/api/images',
+});
+
+// centralise error handler
+app.setErrorHandler((error: FastifyError, request, reply) => {
+  request.log.error(error);
+
+  const statusCode = error.statusCode ?? 500;
+
+  if (error instanceof ImageValidationError) {
+    return reply.code(error.statusCode).send({
+      ok: false,
+      message: error.message,
+    });
+  }
+
+  return reply.code(statusCode).send({
+    ok: false,
+    message: statusCode >= 500 ? 'Internal server error' : error.message,
+  });
 });
 
 // process.on('SIGTERM', () => {
