@@ -1,10 +1,45 @@
-import sharp from 'sharp';
+import sharp, { type Metadata } from 'sharp';
+import { imageFormatSchema } from '../schemas/image.schema.ts';
+import { env } from '../config/env.ts';
+
+export class ImageValidationError extends Error {
+  readonly statusCode: 400 | 415;
+
+  constructor(message: string, statusCode: 400 | 415 = 400) {
+    super(message);
+    this.name = 'ImageValidationError';
+    this.statusCode = statusCode;
+  }
+}
 
 export async function inspectImage(buffer: Buffer) {
-  const metadata = await sharp(buffer).metadata();
+  let metadata: Metadata;
 
-  if (!metadata.format || !metadata.width || !metadata.height) {
-    throw new Error('Invalid image');
+  try {
+    const image = sharp(buffer, {
+      failOn: 'error',
+    });
+
+    metadata = await image.metadata();
+
+    await image.stats(); // forcing Sharp tà decode the image pixels.
+  } catch {
+    throw new ImageValidationError('Invalid or corrupted image', 400);
+  }
+
+  const format = imageFormatSchema.safeParse(metadata.format);
+
+  if (!format.success) {
+    throw new ImageValidationError('Unsupported image format', 415);
+  }
+
+  if (
+    !metadata.width ||
+    !metadata.height ||
+    metadata.width > env.MAX_IMAGE_WIDTH ||
+    metadata.height > env.MAX_IMAGE_HEIGHT
+  ) {
+    throw new ImageValidationError('Invalid image dimensions');
   }
 
   return {
