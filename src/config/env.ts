@@ -7,6 +7,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   HOST: z.string().default('0.0.0.0'),
   MAX_UPLOAD_SIZE: z.coerce.number().int().positive().default(10485760), // 10 MB
+  MAX_IMAGE_WIDTH: z.coerce.number().int().positive().default(10000),
+  MAX_IMAGE_HEIGHT: z.coerce.number().int().positive().default(10000),
 });
 
 const result = envSchema.safeParse(process.env);
