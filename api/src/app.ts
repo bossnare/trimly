@@ -4,8 +4,6 @@ import { env } from './config/env.ts';
 import imageRoutes from './routes/image.route.ts';
 import { ImageValidationError } from './services/image.service.ts';
 
-const PORT = process.env.PORT || 3000;
-
 export const app = Fastify({
   logger: true,
 });

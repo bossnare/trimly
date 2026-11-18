@@ -9,6 +9,11 @@ const envSchema = z.object({
   MAX_UPLOAD_SIZE: z.coerce.number().int().positive().default(10485760), // 10 MB
   MAX_IMAGE_WIDTH: z.coerce.number().int().positive().default(10000),
   MAX_IMAGE_HEIGHT: z.coerce.number().int().positive().default(10000),
+
+  // rembg
+  REMBG_URL: z.string().default('http://127.0.0.1:7000'),
+  REMBG_TIMEOUT_MS: z.coerce.number().int().positive().default(180000),
+  REMBG_MODEL: z.string().default('birefnet-general'),
 });
 
 const result = envSchema.safeParse(process.env);
