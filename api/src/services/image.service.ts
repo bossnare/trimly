@@ -1,7 +1,9 @@
 import sharp, { type Metadata } from 'sharp';
 import {
   imageFormatSchema,
-  type ResizeOptions,
+  type CompressImageOptions,
+  type ConvertImageOptions,
+  type ResizeImageOptions,
 } from '../schemas/image.schema.ts';
 import { env } from '../config/env.ts';
 
@@ -27,7 +29,10 @@ export async function inspectImage(buffer: Buffer) {
 
     await image.stats(); // forcing Sharp decode the image pixels.
   } catch (error) {
-    throw new ImageValidationError('Invalid or corrupted image', 400);
+    throw new ImageValidationError(
+      'Invalid image format or corrupted image',
+      400
+    );
   }
 
   const format = imageFormatSchema.safeParse(metadata.format);
@@ -53,7 +58,7 @@ export async function inspectImage(buffer: Buffer) {
   };
 }
 
-export async function resizeImage(buffer: Buffer, options: ResizeOptions) {
+export async function resizeImage(buffer: Buffer, options: ResizeImageOptions) {
   return sharp(buffer)
     .resize({
       width: options.width,
@@ -61,6 +66,57 @@ export async function resizeImage(buffer: Buffer, options: ResizeOptions) {
       fit: options.fit,
       withoutEnlargement: options.withoutEnlargement,
     })
-    .webp()
+    .webp() // return output to webp format for V1
     .toBuffer();
+}
+
+export async function convertImage(
+  buffer: Buffer,
+  options: ConvertImageOptions
+) {
+  return sharp(buffer)
+    .toFormat(options.format, {
+      quality: options.quality,
+    })
+    .toBuffer();
+}
+
+export async function compressImage(
+  buffer: Buffer,
+  options: CompressImageOptions
+) {
+  const image = sharp(buffer);
+  const metadata = await image.metadata();
+
+  switch (metadata.format) {
+    case 'jpeg':
+      return image
+        .jpeg({
+          quality: options.quality,
+          mozjpeg: true,
+        })
+        .toBuffer();
+
+    case 'png':
+      return image
+        .png({
+          compressionLevel: 9,
+          adaptiveFiltering: true,
+        })
+        .toBuffer();
+
+    case 'webp':
+      return image
+        .webp({
+          quality: options.quality,
+        })
+        .toBuffer();
+
+    case 'avif':
+      return image
+        .avif({
+          quality: options.quality,
+        })
+        .toBuffer();
+  }
 }
