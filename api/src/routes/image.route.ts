@@ -1,17 +1,17 @@
+import '@fastify/multipart';
 import type { FastifyPluginAsync } from 'fastify';
+import { getUploadedFile } from '../helpers/get-uploaded-file.ts';
+import {
+  compressImageSchema,
+  convertImageSchema,
+  resizeImageSchema,
+} from '../schemas/image.schema.ts';
 import {
   compressImage,
   convertImage,
   inspectImage,
   resizeImage,
 } from '../services/image.service.ts';
-import {
-  compressImageSchema,
-  convertImageSchema,
-  resizeImageSchema,
-} from '../schemas/image.schema.ts';
-import { getUploadedFile } from '../helpers/get-uploaded-file.ts';
-import '@fastify/multipart';
 
 const imageRoutes: FastifyPluginAsync = async (app) => {
   // upload route
