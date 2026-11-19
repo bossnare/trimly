@@ -78,7 +78,11 @@ export async function inspectImage(buffer: Buffer) {
     );
   }
 
-  const format = imageFormatSchema.safeParse(metadata.format);
+  const formatName =
+    metadata.format === 'heif' && metadata.mediaType === 'image/avif'
+      ? 'avif'
+      : metadata.format;
+  const format = imageFormatSchema.safeParse(formatName);
 
   if (!format.success) {
     throw new ImageValidationError('Unsupported image format', 415);
@@ -94,7 +98,7 @@ export async function inspectImage(buffer: Buffer) {
   }
 
   return {
-    format: metadata.format,
+    format: format.data,
     width: metadata.width,
     height: metadata.height,
     size: buffer.length,
@@ -155,7 +159,7 @@ export async function compressImage(
         })
         .toBuffer();
 
-    case 'avif':
+    case 'heif': // as avif input sharp name 'heif'
       return image
         .avif({
           quality: options.quality,
