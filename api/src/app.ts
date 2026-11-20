@@ -2,7 +2,7 @@ import multipart from '@fastify/multipart';
 import Fastify, { type FastifyError } from 'fastify';
 import { env } from './config/env.ts';
 import imageRoutes from './routes/image.route.ts';
-import { ImageValidationError } from './services/image.service.ts';
+import { AppError } from './services/image.service.ts';
 
 export const app = Fastify({
   logger: true,
@@ -21,7 +21,7 @@ app.setErrorHandler((error: FastifyError, request, reply) => {
 
   const statusCode = error.statusCode ?? 500;
 
-  if (error instanceof ImageValidationError) {
+  if (error instanceof AppError) {
     return reply.code(error.statusCode).send({
       ok: false,
       message: error.message,

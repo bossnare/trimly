@@ -1,17 +1,12 @@
-import '@fastify/multipart';
 import type { FastifyPluginAsync } from 'fastify';
+import * as z from 'zod';
 import { getUploadedFile } from '../helpers/get-uploaded-file.ts';
 import {
   compressImageSchema,
   convertImageSchema,
   resizeImageSchema,
 } from '../schemas/image.schema.ts';
-import {
-  compressImage,
-  convertImage,
-  inspectImage,
-  resizeImage,
-} from '../services/image.service.ts';
+import { AppError, imageService } from '../services/image.service.ts';
 
 const imageRoutes: FastifyPluginAsync = async (app) => {
   // upload route
@@ -19,14 +14,11 @@ const imageRoutes: FastifyPluginAsync = async (app) => {
     const file = await getUploadedFile(request);
 
     if (!file) {
-      return reply.code(400).send({
-        ok: false,
-        message: 'No valid image file provided',
-      });
+      throw new AppError('No valid image file provided', 400);
     }
 
     // inject service: inspect
-    const image = await inspectImage(file.buffer);
+    const image = await imageService.inspectImage(file.buffer);
 
     return {
       ok: true,
@@ -44,13 +36,10 @@ const imageRoutes: FastifyPluginAsync = async (app) => {
     const file = await getUploadedFile(request);
 
     if (!file) {
-      return reply.code(400).send({
-        ok: false,
-        message: 'No valid image file provided',
-      });
+      throw new AppError('No valid image file provided', 400);
     }
 
-    await inspectImage(file.buffer); // inspect validation image
+    await imageService.inspectImage(file.buffer); // inspect validation image
 
     const parsed = resizeImageSchema.safeParse(request.query);
 
@@ -62,7 +51,7 @@ const imageRoutes: FastifyPluginAsync = async (app) => {
       });
     }
 
-    const result = await resizeImage(file.buffer, parsed.data);
+    const result = await imageService.resizeImage(file.buffer, parsed.data);
 
     return reply.type('image/webp').send(result);
   });
@@ -72,13 +61,10 @@ const imageRoutes: FastifyPluginAsync = async (app) => {
     const file = await getUploadedFile(request);
 
     if (!file) {
-      return reply.code(400).send({
-        ok: false,
-        message: 'No valid image file provided',
-      });
+      throw new AppError('No valid image file provided', 400);
     }
 
-    await inspectImage(file.buffer); // inspect validation image
+    await imageService.inspectImage(file.buffer); // inspect validation image
 
     const parsed = convertImageSchema.safeParse(request.query);
 
@@ -90,7 +76,7 @@ const imageRoutes: FastifyPluginAsync = async (app) => {
       });
     }
 
-    const result = await convertImage(file.buffer, parsed.data);
+    const result = await imageService.convertImage(file.buffer, parsed.data);
 
     const contentType = `image/${parsed.data.format}`;
 
@@ -102,13 +88,10 @@ const imageRoutes: FastifyPluginAsync = async (app) => {
     const file = await getUploadedFile(request);
 
     if (!file) {
-      return reply.code(400).send({
-        ok: false,
-        message: 'No valid image file provided',
-      });
+      throw new AppError('No valid image file provided', 400);
     }
 
-    await inspectImage(file.buffer); // inspect validation image
+    await imageService.inspectImage(file.buffer); // inspect validation image
 
     const parsed = compressImageSchema.safeParse(request.query);
 
@@ -120,15 +103,23 @@ const imageRoutes: FastifyPluginAsync = async (app) => {
       });
     }
 
-    const result = await compressImage(file.buffer, parsed.data);
+    const result = await imageService.compressImage(file.buffer, parsed.data);
 
     return reply.type(file.mimetype).send(result);
   });
 
   app.post('/remove-background', async (request, reply) => {
-    return reply.code(200).send({
-      implementation: 'loading',
-    });
+    const file = await getUploadedFile(request);
+
+    if (!file) {
+      throw new AppError('No valid image file provided', 400);
+    }
+
+    // inject service: inspect
+    await imageService.inspectImage(file.buffer);
+
+    const result = await imageService.removeImageBackground(file.buffer);
+    return reply.type('image/png').send(result);
   });
 };
 
