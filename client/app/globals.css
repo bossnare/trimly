@@ -1,0 +1,84 @@
+@import 'tailwindcss';
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+  --primary: #e88924; /* #5b2eff */
+  --muted-foreground: #52525b;
+  --primary-foreground: #0a0a0a;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-primary-foreground: var(--primary-foreground);
+  --font-sans: var(--font-general-sans);
+  --font-display: var(--font-clash-display);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #f5f5f5;
+    --primary: #ffb86b;
+    --muted-foreground: #a3a3a3;
+    --primary-foreground: #0a0a0a;
+  }
+}
+
+body {
+  @apply bg-[#F5F5F3] dark:bg-black;
+  color: var(--foreground);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  @apply font-display;
+}
+
+button {
+  @apply cursor-pointer;
+}
+
+@keyframes typewriter {
+  from {
+    width: 0;
+  }
+  to {
+    width: 11ch;
+  }
+}
+
+.typewriter {
+  display: inline-block;
+  width: 11ch;
+  overflow: hidden;
+  white-space: nowrap;
+  animation:
+    typewriter 1.4s steps(13, end) both,
+    typewriter-cursor 0.75s steps(1, end) infinite;
+}
+
+@keyframes typewriter-cursor {
+  0%,
+  49% {
+    border-color: var(--primary);
+  }
+  50%,
+  100% {
+    border-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typewriter {
+    animation: none;
+    width: 11ch;
+  }
+}
