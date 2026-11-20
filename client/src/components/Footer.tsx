@@ -1,0 +1,55 @@
+import { SocialLinks } from './SocialLinks';
+
+export function Footer() {
+  return (
+    <footer className="w-full mt-20 px-4 py-10 border-t bg-foreground text-background dark:text-foreground border-[#ffffff0a] dark:bg-zinc-950 md:px-0 md:py-12">
+      <div className="flex flex-col w-full max-w-6xl gap-8 mx-auto">
+        <div className="flex flex-col gap-8 sm:flex-row sm:items-start sm:justify-between">
+          <div className="max-w-sm space-y-2">
+            <p className="text-lg font-bold font-display">
+              Christo Razafimanga
+            </p>
+            <p className="text-sm leading-6 text-[#a1a1aa]">
+              Full-stack developer creating scalable products, polished
+              interfaces, and reliable experiences from concept to launch.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2 sm:items-end">
+            <span className="text-xs font-semibold tracking-wider font-display uppercase text-[#a1a1aa]">
+              Connect
+            </span>
+            <SocialLinks />
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-3 pt-5 text-sm border-t text-[#a1a1aa] border-[#ffffff0a] sm:flex-row sm:items-center sm:justify-between">
+          <nav
+            aria-label="Footer navigation"
+            className="flex flex-wrap gap-x-5 gap-y-2"
+          >
+            <a
+              className="transition-colors hover:text-background dark:hover:text-foreground"
+              href="#about"
+            >
+              About
+            </a>
+            <a
+              className="transition-colors hover:text-background dark:hover:text-foreground"
+              href="#featured-projects"
+            >
+              Projects
+            </a>
+            <a
+              className="transition-colors hover:text-background dark:hover:text-foreground"
+              href="#hero"
+            >
+              Home
+            </a>
+          </nav>
+          <span>© {new Date().getFullYear()} Christo Razafimanga</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
