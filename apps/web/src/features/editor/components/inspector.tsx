@@ -14,11 +14,11 @@ export function Inspector() {
   return (
     <aside
       aria-label="Settings"
-      className="border-border bg-card flex w-full flex-col gap-5 border-t p-5 lg:w-86 lg:shrink-0 lg:overflow-y-auto lg:border-t-0 lg:border-l"
+      className="flex flex-col w-full gap-5 p-5 pb-0 overflow-x-hidden border-t bg-card border-border lg:w-86 lg:shrink-0 lg:overflow-y-auto lg:border-t-0 lg:border-l"
     >
       <header className="space-y-1.5">
-        <h2 className="font-heading text-2xl font-semibold tracking-tight">{tool.title}</h2>
-        <p className="text-muted-foreground text-sm leading-relaxed">{tool.description}</p>
+        <h2 className="text-2xl font-semibold tracking-tight font-heading">{tool.title}</h2>
+        <p className="text-sm leading-relaxed text-muted-foreground">{tool.description}</p>
       </header>
       <OptionsPanel />
       {/* On small screens the sticky download bar replaces this button once there is a result. */}

@@ -15,7 +15,7 @@ export function EditorShell() {
     <EditorProvider>
       <ImportProvider>
         <ProcessingProvider>
-          <div className="flex min-h-dvh flex-col lg:h-dvh">
+          <div className="flex min-h-dvh flex-col overflow-hidden lg:h-dvh">
             <EditorTopbar />
             <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
               <ToolRail />
