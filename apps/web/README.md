@@ -1,36 +1,88 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Trimly
 
-## Getting Started
+Image tools in one tab: resize, convert, compress and remove the background.
+Front-end for an existing image-processing backend.
 
-First, run the development server:
+**Stack:** Next.js 16 (App Router), TypeScript, Tailwind CSS 4, TanStack Query, axios, motion, lucide-react, zod, next-themes.
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env.local   # set NEXT_PUBLIC_API_BASE_URL
+npm install
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Scripts: `dev`, `build`, `start`, `lint`, `typecheck`, `format`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Dependencies only point one way: `app → features → components → lib`.
 
-## Learn More
+```
+src/
+  app/            Routing and metadata only (server components). globals.css = design tokens.
+  features/
+    landing/      Marketing page sections and their content.
+    editor/       Three-column editor: tool rail, stage, inspector. State and options panels.
+    images/       The image domain, no React UI: types, constants, zod schemas,
+                  api/ (axios calls), hooks/ (TanStack Query), utils/.
+  components/
+    ui/           Generic primitives (Button, Switch, Slider, SegmentedControl...).
+    layout/       Logo, ThemeToggle.
+    shared/       Reusable blocks (CompareSlider, FitDiagram, PreviewImage, SampleScene).
+  lib/
+    http/         axios factory, ApiError, one interceptor that normalises every failure.
+    utils/        cn, format helpers.
+  providers/      Query, theme and motion providers.
+  config/         env, validated with zod.
+```
 
-To learn more about Next.js, take a look at the following resources:
+### How data flows
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. **Import** (`editor/hooks/use-import-image`): a file or a URL becomes a `SourceImage`
+   (validated, decoded to read its real size). URLs go through `app/api/image-proxy`
+   (SSRF-protected, size-limited) to avoid CORS.
+2. **State** (`editor/state`): `useReducer` + context holds the tool, per-tool options and the source image.
+3. **Processing** (`images/hooks/use-process-image`): one TanStack query per (image, tool, options),
+   debounced, cancelled through `AbortSignal` when settings change, cached, retried only for
+   network, timeout, 429 and 5xx errors.
+4. **Phase** (`editor/state/editor-phase`): `empty | processing | result | error` is **derived**, never stored.
+5. **UI**: the stage, inspector and download bars read the phase and result from context.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Backend contract
 
-## Deploy on Vercel
+Paths live in `features/images/api/endpoints.ts`; field mapping in `request-mappers.ts`.
+All routes take `multipart/form-data` with `file` and return the processed image as binary.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Route | Fields |
+| --- | --- |
+| `POST /images/resize` | `width?`, `height?`, `fit`, `withoutEnlargement` |
+| `POST /images/convert` | `format`, `quality?` (not for PNG) |
+| `POST /images/compress` | `quality?` (not for PNG, format is kept) |
+| `POST /images/remove-background` | `fill`, `color?` (only when `fill=custom`) |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Adjust those two files if your backend differs. Nothing else knows about routes or field names.
+
+## Scenarios handled
+
+- **Files:** empty file, wrong type, over 10 MB, corrupted image, several files dropped (first one used).
+- **URLs:** invalid link, non-http(s), private or local addresses, not an image, too large, slow host, redirects.
+- **Settings:** width or height required for resize, 1–16384 px, quality 1–100, quality hidden for PNG,
+  aspect ratio lock, prevent enlargement on by default.
+- **Requests:** debounce, cancellation of stale requests, caching, retry rules, 413, 415, 429 (with `Retry-After`), timeout, offline.
+- **Results:** result larger than the original (shown as `+x%`), download name and extension follow the real output format.
+- **UI:** light and dark theme, reduced motion, keyboard-accessible slider, tabs and switches, mobile sticky download bar.
+
+## Add a tool
+
+1. Add its id and options to `features/images/types.ts`, defaults to `constants.ts`, a schema to `schemas.ts`.
+2. Add its endpoint and field mapping in `images/api`.
+3. Add an entry to `editor/tool-meta.ts` and an options component registered in `editor/components/options/options-panel.tsx`.
+
+## Notes
+
+- Fonts (Bricolage Grotesque and Instrument Sans) load through `next/font/google` at build time.
+- Design tokens use shadcn variable names (`--background`, `--primary`, `--card`...) plus `--brand`,
+  `--brand-fill` and `--glow`. The primary button is monochrome; teal is the accent.
+- Recommended next steps: Vitest + Testing Library for `images/utils` and the reducer, MSW for the API layer.

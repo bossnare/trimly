@@ -1,84 +1,320 @@
-@import 'tailwindcss';
+@import "tailwindcss";
+
+/* Dark mode: add the `dark` class to <html> (shadcn standard). */
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   Trimly — design tokens, variant B: "Vercel / Linear" look
+   Tailwind v4 + shadcn variable names, OKLCH. Drop-in alternative to globals.css.
+
+   What changes compared with the first theme:
+   - Monochrome actions: --primary is near-black (light) / near-white (dark), used by solid pill
+     buttons. The brand teal moves to --brand (text, thin accents) and --brand-fill (solid fills).
+   - Near-black canvas with hairline borders (alpha-based) instead of tinted surfaces.
+   - Larger radius: --radius 1rem. Buttons are pills (rounded-full), tiles use rounded-xl (24px),
+     inner panels use rounded-md (14px).
+   ========================================================================== */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --primary: #e88924; /* #5b2eff */
-  --muted-foreground: #52525b;
-  --primary-foreground: #0a0a0a;
+  /* Base radius. rounded-xl = 24px (tiles), rounded-md = 14px (inner panels). */
+  --radius: 1rem;
+
+  /* Page background (#ffffff). */
+  --background: oklch(1.000 0 0);
+
+  /* Default text (#0a0a0b). */
+  --foreground: oklch(0.145 0.002 286);
+
+  /* Bento tiles, product window, CTA panel (#fafafa). */
+  --card: oklch(0.985 0 0);
+
+  /* Text on cards. */
+  --card-foreground: oklch(0.145 0.002 286);
+
+  /* Menus, tooltips, dialogs (#ffffff). */
+  --popover: oklch(1.000 0 0);
+
+  /* Text inside popovers. */
+  --popover-foreground: oklch(0.145 0.002 286);
+
+  /* Main action: the solid pill button (#0a0a0b). Monochrome on purpose; the brand teal is an accent. */
+  --primary: oklch(0.145 0.002 286);
+
+  /* Label on the primary button (#fafafa). */
+  --primary-foreground: oklch(0.985 0 0);
+
+  /* Quiet fills: inactive tabs, chips (#f4f4f5). */
+  --secondary: oklch(0.967 0.001 286);
+
+  /* Text on secondary. */
+  --secondary-foreground: oklch(0.145 0.002 286);
+
+  /* Recessed areas such as the image stage behind a preview (#f4f4f5). */
+  --muted: oklch(0.967 0.001 286);
+
+  /* Secondary text, captions, placeholders (#62626b, 6:1 on white). */
+  --muted-foreground: oklch(0.499 0.014 286);
+
+  /* Hover/selected item background (#f4f4f5). */
+  --accent: oklch(0.967 0.001 286);
+
+  /* Text on accent. */
+  --accent-foreground: oklch(0.145 0.002 286);
+
+  /* Errors and destructive actions (#c8372d). */
+  --destructive: oklch(0.555 0.184 29);
+
+  /* Text on destructive. */
+  --destructive-foreground: oklch(0.985 0 0);
+
+  /* Focus ring, deep teal (#0a6b61). */
+  --ring: oklch(0.475 0.082 184);
+
+  /* Brand teal for text and thin accents: dots, active tab underline, links (#0a6b61, 6:1). */
+  --brand: oklch(0.475 0.082 184);
+
+  /* Brand teal for solid fills with white content: logo tile (#0c8477). */
+  --brand-fill: oklch(0.552 0.096 183);
+
+  /* Chart 1: brand teal. */
+  --chart-1: oklch(0.552 0.096 183);
+
+  /* Chart 2: blue (#2b7fcf). */
+  --chart-2: oklch(0.587 0.146 251);
+
+  /* Chart 3: amber (#b8780a). */
+  --chart-3: oklch(0.625 0.132 72);
+
+  /* Chart 4: coral (#d4634f). */
+  --chart-4: oklch(0.633 0.147 32);
+
+  /* Chart 5: violet (#7c5ce0). */
+  --chart-5: oklch(0.576 0.192 290);
+
+  /* Transparency grid, dark squares. */
+  --checker-a: oklch(0.940 0 0);
+
+  /* Transparency grid, light squares. */
+  --checker-b: oklch(1.000 0 0);
+
+  /* Hairlines: card borders, dividers, nav outline. */
+  --border: oklch(0 0 0 / 9%);
+
+  /* Stronger outline: product window frame, outlined buttons, input borders. */
+  --input: oklch(0 0 0 / 16%);
+
+  /* Soft teal glow behind the hero product window and the closing panel. */
+  --glow: oklch(0.527 0.099 183 / 14%);
+
+  /* Sidebar (future signed-in shell): mirrors card and primary. */
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0.003 285);
+  --sidebar-primary: oklch(0.145 0.003 285);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.967 0.001 286);
+  --sidebar-accent-foreground: oklch(0.145 0.003 285);
+  --sidebar-border: oklch(0 0 0 / 9%);
+  --sidebar-ring: var(--ring);
+}
+
+.dark {
+  /* Page background: near-black (#050505). */
+  --background: oklch(0.115 0 0);
+
+  /* Default text (#f4f4f5). */
+  --foreground: oklch(0.967 0.001 286);
+
+  /* Bento tiles, product window, CTA panel (#0b0b0d). */
+  --card: oklch(0.151 0.004 286);
+
+  /* Text on cards. */
+  --card-foreground: oklch(0.967 0.001 286);
+
+  /* Menus, tooltips, dialogs; one step above cards (#131316). */
+  --popover: oklch(0.188 0.006 286);
+
+  /* Text inside popovers. */
+  --popover-foreground: oklch(0.967 0.001 286);
+
+  /* Main action: the solid pill button turns near-white (#f4f4f5). */
+  --primary: oklch(0.967 0.001 286);
+
+  /* Label on the primary button (#0a0a0b). */
+  --primary-foreground: oklch(0.145 0.002 286);
+
+  /* Quiet fills: inactive tabs, chips (#131316). */
+  --secondary: oklch(0.188 0.006 286);
+
+  /* Text on secondary. */
+  --secondary-foreground: oklch(0.967 0.001 286);
+
+  /* Recessed areas such as the image stage behind a preview (#131316). */
+  --muted: oklch(0.188 0.006 286);
+
+  /* Secondary text, captions, placeholders (#9d9da6, 7:1 on cards). */
+  --muted-foreground: oklch(0.699 0.013 286);
+
+  /* Hover/selected item background (#1a1a1f). */
+  --accent: oklch(0.220 0.010 286);
+
+  /* Text on accent. */
+  --accent-foreground: oklch(0.967 0.001 286);
+
+  /* Errors and destructive actions, lifted for dark (#e5584d). */
+  --destructive: oklch(0.644 0.178 28);
+
+  /* Text on destructive. */
+  --destructive-foreground: oklch(0.985 0 0);
+
+  /* Focus ring, light teal (#4fd1c0). */
+  --ring: oklch(0.785 0.116 183);
+
+  /* Brand teal for text and thin accents on dark (#4fd1c0, 10:1). */
+  --brand: oklch(0.785 0.116 183);
+
+  /* Brand teal for solid fills with white content: logo tile (#0c8477). */
+  --brand-fill: oklch(0.552 0.096 183);
+
+  /* Chart 1: brand teal. */
+  --chart-1: oklch(0.785 0.116 183);
+
+  /* Chart 2: sky blue (#6fb3f2). */
+  --chart-2: oklch(0.747 0.115 248);
+
+  /* Chart 3: amber (#e8b04a). */
+  --chart-3: oklch(0.791 0.134 79);
+
+  /* Chart 4: coral (#ec8d7a). */
+  --chart-4: oklch(0.739 0.120 32);
+
+  /* Chart 5: violet (#a78bfa). */
+  --chart-5: oklch(0.709 0.159 294);
+
+  /* Transparency grid, dark squares. */
+  --checker-a: oklch(0.228 0.008 286);
+
+  /* Transparency grid, light squares. */
+  --checker-b: oklch(0.271 0.009 286);
+
+  /* Hairlines: card borders, dividers, nav outline. */
+  --border: oklch(1 0 0 / 9%);
+
+  /* Stronger outline: product window frame, outlined buttons, input borders. */
+  --input: oklch(1 0 0 / 16%);
+
+  /* Soft teal glow behind the hero product window and the closing panel. */
+  --glow: oklch(0.777 0.123 183 / 18%);
+
+  /* Sidebar (future signed-in shell): mirrors card and primary. */
+  --sidebar: oklch(0.19 0.004 286);
+  --sidebar-foreground: oklch(0.97 0.001 286);
+  --sidebar-primary: oklch(0.97 0.001 286);
+  --sidebar-primary-foreground: oklch(0.19 0.004 286);
+  --sidebar-accent: oklch(0.24 0.005 286);
+  --sidebar-accent-foreground: oklch(0.97 0.001 286);
+  --sidebar-border: oklch(1 0 0 / 9%);
+  --sidebar-ring: var(--ring);
 }
 
 @theme inline {
+  /* Fonts: loaded with next/font (--font-bricolage, --font-instrument). */
+  --font-sans: var(--font-instrument), ui-sans-serif, system-ui, sans-serif;
+  --font-heading: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 8px);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
-  --color-muted-foreground: var(--muted-foreground);
   --color-primary-foreground: var(--primary-foreground);
-  --font-sans: var(--font-general-sans);
-  --font-display: var(--font-clash-display);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-brand: var(--brand);
+  --color-brand-fill: var(--brand-fill);
+  --color-glow: var(--glow);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #f5f5f5;
-    --primary: #ffb86b;
-    --muted-foreground: #a3a3a3;
-    --primary-foreground: #0a0a0a;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3 {
+    @apply font-heading;
+    letter-spacing: -0.04em; /* tight display tracking, the signature of this look */
   }
 }
 
-body {
-  @apply bg-[#F5F5F3] dark:bg-black;
-  color: var(--foreground);
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  @apply font-display;
-}
-
-button {
-  @apply cursor-pointer;
-}
-
-@keyframes typewriter {
-  from {
-    width: 0;
+@layer components {
+  /* Silver fade on large headlines: text to 50% of itself. Use on h1/h2 only. */
+  .text-gradient {
+    background: linear-gradient(180deg, var(--foreground) 35%, color-mix(in srgb, var(--foreground) 50%, transparent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
-  to {
-    width: 11ch;
-  }
-}
 
-.typewriter {
-  display: inline-block;
-  width: 11ch;
-  overflow: hidden;
-  white-space: nowrap;
-  animation:
-    typewriter 1.4s steps(13, end) both,
-    typewriter-cursor 0.75s steps(1, end) infinite;
-}
-
-@keyframes typewriter-cursor {
-  0%,
-  49% {
-    border-color: var(--primary);
+  /* Radial brand glow, placed behind a product shot. */
+  .glow {
+    background: radial-gradient(ellipse at center, var(--glow), transparent 70%);
   }
-  50%,
-  100% {
-    border-color: transparent;
+
+  /* Transparency grid for cut-out previews. */
+  .checkerboard {
+    background-color: var(--checker-b);
+    background-image:
+      linear-gradient(45deg, var(--checker-a) 25%, transparent 25%, transparent 75%, var(--checker-a) 75%),
+      linear-gradient(45deg, var(--checker-a) 25%, transparent 25%, transparent 75%, var(--checker-a) 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 10px 10px;
+  }
+
+  /* Large faint ring outline behind the hero. */
+  .arc {
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    mask-image: linear-gradient(#000 20%, transparent 60%);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .typewriter {
-    animation: none;
-    width: 11ch;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
   }
 }
