@@ -2,6 +2,7 @@ import { Logo } from "@/components/layout/logo";
 import { ThemeToggle } from "@/components/layout/theme-toggle";
 import { ButtonLink } from "@/components/ui/button-link";
 import { NAV_LINKS } from "../content";
+import { MobileMenuToggle } from "@/components/layout/mobile-menu-toggle";
 
 export function LandingNav() {
   return (
@@ -28,6 +29,7 @@ export function LandingNav() {
           <ButtonLink href="/editor" size="sm">
             Open the app
           </ButtonLink>
+          <MobileMenuToggle />
         </div>
       </nav>
     </div>
