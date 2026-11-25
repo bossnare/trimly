@@ -3,7 +3,7 @@ import { DIMENSION_LIMITS, QUALITY } from "./constants";
 import type { ToolId, ToolOptionsMap } from "./types";
 
 const dimension = z
-  .number({ invalid_type_error: "Enter a whole number." })
+  .number({ error: "Enter a whole number." })
   .int("Enter a whole number.")
   .min(DIMENSION_LIMITS.min, `Minimum is ${DIMENSION_LIMITS.min} px.`)
   .max(DIMENSION_LIMITS.max, `Maximum is ${DIMENSION_LIMITS.max} px.`)
