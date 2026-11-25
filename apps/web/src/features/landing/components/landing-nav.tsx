@@ -29,7 +29,9 @@ export function LandingNav() {
           <ButtonLink href="/editor" size="sm">
             Open the app
           </ButtonLink>
-          <MobileMenuToggle />
+          <div className="hidden">
+            <MobileMenuToggle />
+          </div>
         </div>
       </nav>
     </div>

@@ -19,13 +19,13 @@ export function Switch({ checked, onCheckedChange, label, className }: SwitchPro
       aria-label={label}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "relative h-[26px] w-11 shrink-0 cursor-pointer rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring",
+        "focus-visible:outline-ring relative h-6.5 w-11 shrink-0 cursor-pointer rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2",
         checked ? "bg-primary" : "bg-muted-foreground",
         className,
       )}
     >
       <motion.span
-        className="absolute top-[3px] left-[3px] size-5 rounded-full bg-white"
+        className="bg-background absolute top-[3px] left-[3px] size-5 rounded-full"
         animate={{ x: checked ? 18 : 0 }}
         transition={{ type: "spring", stiffness: 500, damping: 32 }}
       />

@@ -6,7 +6,13 @@ export function FitDiagram({ diagram, className }: { diagram: FitModeInfo["diagr
   const [x, y, w, h] = diagram.image;
   return (
     <svg viewBox="0 0 64 48" aria-hidden className={cn("h-9 w-12", className)}>
-      <rect x="14" y="10" width="36" height="28" className={diagram.boxFilled ? "fill-muted" : "fill-transparent"} />
+      <rect
+        x="14"
+        y="10"
+        width="36"
+        height="28"
+        className={diagram.boxFilled ? "fill-muted" : "fill-transparent"}
+      />
       <rect x={x} y={y} width={w} height={h} rx="2" className="fill-brand opacity-85" />
       <rect
         x="14"
