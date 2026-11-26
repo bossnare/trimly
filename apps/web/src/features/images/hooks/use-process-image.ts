@@ -19,6 +19,7 @@ interface ProcessingVariables {
   options: ToolOptions;
   /** Stable identity for this exact source/tool/options combination. */
   fingerprint: string;
+  signal: AbortSignal;
 }
 
 function fingerprint(source: SourceImage, tool: ToolId, options: ToolOptions) {
@@ -42,7 +43,9 @@ export function useProcessImage({ source, tool, options }: Params) {
   useEffect(() => () => abortRef.current?.abort(), []);
 
   const currentFingerprint = source ? fingerprint(source, tool, options) : null;
-  const matchesCurrent = Boolean(currentFingerprint && mutation.variables?.fingerprint === currentFingerprint);
+  const matchesCurrent = Boolean(
+    currentFingerprint && mutation.variables?.fingerprint === currentFingerprint,
+  );
 
   // Stop work for a previous image or settings snapshot when the editor changes.
   useEffect(() => {
@@ -51,11 +54,12 @@ export function useProcessImage({ source, tool, options }: Params) {
     }
   }, [currentFingerprint, mutation.isPending, mutation.variables?.fingerprint]);
   const result = matchesCurrent ? mutation.data : undefined;
-  const error = matchesCurrent && mutation.error instanceof ApiError
-    ? mutation.error
-    : matchesCurrent && mutation.error
-      ? new ApiError("UNKNOWN", "Processing failed.")
-      : null;
+  const error =
+    matchesCurrent && mutation.error instanceof ApiError
+      ? mutation.error
+      : matchesCurrent && mutation.error
+        ? new ApiError("UNKNOWN", "Processing failed.")
+        : null;
 
   const process = () => {
     if (!source || !validation.valid) return;
