@@ -19,10 +19,16 @@ export function Stage() {
   const { phase } = useProcessing();
   const View = VIEWS[phase];
   return (
-    <main className="flex min-w-0 flex-1 flex-col items-center justify-center p-4 [background-image:radial-gradient(var(--border)_1px,transparent_1px)] [background-size:24px_24px] lg:overflow-y-auto lg:p-7">
-      <div className="w-full max-w-[720px]">
+    <main className="flex min-w-0 flex-1 flex-col items-center justify-center bg-[radial-gradient(var(--border)_1px,transparent_1px)] bg-size-[24px_24px] p-4 lg:overflow-y-auto lg:p-7">
+      <div className="w-full max-w-180">
         <AnimatePresence mode="wait" initial={false}>
-          <motion.div key={phase} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.18 }}>
+          <motion.div
+            key={phase}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
+          >
             <View />
           </motion.div>
         </AnimatePresence>
