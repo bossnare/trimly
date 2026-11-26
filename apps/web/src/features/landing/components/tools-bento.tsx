@@ -10,7 +10,7 @@ import { Tile } from "./tile";
 export function ToolsBento() {
   return (
     <section id="tools" className="mx-auto max-w-[1080px] scroll-mt-24 px-5 pt-36 md:px-8">
-      <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
+      <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
         <SectionHeading className="max-w-[560px]">Four tools, tuned for the details.</SectionHeading>
         <p className="text-muted-foreground max-w-[380px] text-[17px] leading-relaxed">
           Every control maps to something your image needs: its size, its format, its weight or its
@@ -19,7 +19,7 @@ export function ToolsBento() {
       </div>
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-6">
         <Tile
-          className="lg:col-span-2"
+          className="lg:col-span-4"
           title="Five ways to fit"
           description="Cover, contain, fill, inside and outside decide how an image meets the size you set. Pick one to see what it does."
         >
@@ -30,11 +30,11 @@ export function ToolsBento() {
           title="Four formats"
           description="Convert to the one that fits where the image is going."
         >
-          <ul className="overflow-hidden border border-border bg-background rounded-2xl">
+          <ul className="border-border bg-background overflow-hidden rounded-2xl border">
             {FORMATS.map((format, index) => (
               <li key={format.id} className={index === 0 ? "px-4 py-3" : "border-border border-t px-4 py-3"}>
                 <p className="font-semibold">{format.label}</p>
-                <p className="text-sm text-muted-foreground">{format.note}</p>
+                <p className="text-muted-foreground text-sm">{format.note}</p>
               </li>
             ))}
           </ul>
@@ -47,7 +47,7 @@ export function ToolsBento() {
           <QualityDemo />
         </Tile>
         <Tile
-          className="lg:col-span-3"
+          className="lg:col-span-2"
           title="Cut the subject out"
           description="Replace the background with transparency, white or a color of your own. The result is a PNG."
         >
@@ -56,7 +56,7 @@ export function ToolsBento() {
           </div>
         </Tile>
         <Tile
-          className="lg:col-span-3"
+          className="lg:col-span-2"
           title="A file or a link"
           description={`Drop an image from your device or paste its address. Either way, up to ${MAX_UPLOAD_MB} MB.`}
         >

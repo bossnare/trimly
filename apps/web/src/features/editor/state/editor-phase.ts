@@ -1,24 +1,17 @@
-export type EditorPhase = "empty" | "processing" | "result" | "error";
+export type EditorPhase = "empty" | "ready" | "processing" | "result" | "error";
 
 interface PhaseInput {
   hasSource: boolean;
   hasResult: boolean;
   isProcessing: boolean;
   hasError: boolean;
-  hasValidationIssue: boolean;
 }
 
-/**
- * The phase is derived, never stored: it can't drift out of sync with the real state.
- * - no image                          -> empty
- * - request failed                    -> error
- * - result on screen                  -> result (even while refreshing: the preview stays visible)
- * - waiting for the first result      -> processing
- * - invalid options and no result yet -> result view with the validation message
- */
-export function deriveEditorPhase({ hasSource, hasResult, isProcessing, hasError, hasValidationIssue }: PhaseInput): EditorPhase {
+/** Derives the visible stage from the current image and explicit processing request. */
+export function deriveEditorPhase({ hasSource, hasResult, isProcessing, hasError }: PhaseInput): EditorPhase {
   if (!hasSource) return "empty";
   if (hasError && !isProcessing) return "error";
-  if (hasResult || hasValidationIssue) return "result";
-  return "processing";
+  if (isProcessing) return "processing";
+  if (hasResult) return "result";
+  return "ready";
 }

@@ -28,7 +28,7 @@ export function ToolRail() {
             {active && (
               <motion.span
                 layoutId="tool-rail-active"
-                className="bg-muted absolute inset-0 rounded-xl shadow-[inset_3px_0_0_var(--brand)]"
+                className="bg-muted border-brand absolute inset-0 rounded-t-xl border-b-2"
                 transition={{ type: "spring", stiffness: 500, damping: 40 }}
               />
             )}
