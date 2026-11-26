@@ -12,15 +12,16 @@ interface ProcessingContextValue {
   phase: EditorPhase;
   result: ProcessedImage | undefined;
   resultUrl: string | undefined;
-  isUpdating: boolean;
+  isProcessing: boolean;
   error: ApiError | null;
   validationMessage: string | null;
+  process: () => void;
   retry: () => void;
 }
 
 const ProcessingContext = createContext<ProcessingContextValue | null>(null);
 
-/** Single subscription to the processing query, shared by every component below it. */
+/** Single owner of explicit processing requests, shared by the editor UI. */
 export function ProcessingProvider({ children }: { children: ReactNode }) {
   const { state } = useEditor();
   const processing = useProcessImage({
@@ -37,13 +38,13 @@ export function ProcessingProvider({ children }: { children: ReactNode }) {
         hasResult: processing.result !== undefined && resultUrl !== undefined,
         isProcessing: processing.isProcessing,
         hasError: processing.error !== null,
-        hasValidationIssue: processing.validationMessage !== null,
       }),
       result: processing.result,
       resultUrl,
-      isUpdating: processing.isUpdating,
+      isProcessing: processing.isProcessing,
       error: processing.error,
       validationMessage: processing.validationMessage,
+      process: processing.process,
       retry: processing.retry,
     }),
     [state.source, processing, resultUrl],

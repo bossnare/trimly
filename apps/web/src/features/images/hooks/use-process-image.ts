@@ -1,13 +1,10 @@
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { useEffect, useMemo, useRef } from "react";
 import { ApiError, isApiError } from "@/lib/http/errors";
 import { processImage } from "../api/images.api";
-import { imageKeys } from "../query-keys";
 import { validateOptions } from "../schemas";
-import type { ProcessRequest, SourceImage, ToolId, ToolOptions } from "../types";
-import { useDebouncedValue } from "./use-debounced-value";
+import type { ProcessRequest, ProcessedImage, SourceImage, ToolId, ToolOptions } from "../types";
 
-const DEBOUNCE_MS = 400;
 const MAX_RETRIES = 2;
 
 interface Params {
@@ -16,45 +13,74 @@ interface Params {
   options: ToolOptions;
 }
 
+interface ProcessingVariables {
+  source: SourceImage;
+  tool: ToolId;
+  options: ToolOptions;
+  /** Stable identity for this exact source/tool/options combination. */
+  fingerprint: string;
+}
+
+function fingerprint(source: SourceImage, tool: ToolId, options: ToolOptions) {
+  return JSON.stringify([source.id, tool, options]);
+}
+
 /**
- * Auto-preview: every settled change of (image, tool, options) triggers one request.
- * - Debounced, so dragging a slider doesn't flood the backend.
- * - Stale requests are aborted through the AbortSignal TanStack Query provides.
- * - Results are cached per (image, tool, options): going back to a previous setting is instant.
- * - Only retryable failures (network, timeout, 429, 5xx) are retried, at most twice.
+ * Explicit processing: importing an image or changing settings never sends a request.
+ * The caller must invoke process() from a user action.
  */
 export function useProcessImage({ source, tool, options }: Params) {
-  const debouncedOptions = useDebouncedValue(options, DEBOUNCE_MS);
-  const isSettling = debouncedOptions !== options;
+  const validation = useMemo(() => validateOptions(tool, options as never), [tool, options]);
 
-  const validation = useMemo(
-    () => validateOptions(tool, debouncedOptions as never),
-    [tool, debouncedOptions],
-  );
-
-  const query = useQuery({
-    queryKey: imageKeys.process(source?.id, tool, debouncedOptions),
-    queryFn: ({ signal }) =>
-      processImage({ tool, file: source!.file, options: debouncedOptions } as ProcessRequest, signal),
-    enabled: source !== null && validation.valid,
-    staleTime: Infinity,
-    gcTime: 5 * 60_000,
-    refetchOnWindowFocus: false,
-    structuralSharing: false, // results hold Blobs
+  const mutation = useMutation<ProcessedImage, Error, ProcessingVariables>({
+    mutationFn: ({ source: image, tool: selectedTool, options: selectedOptions }) =>
+      processImage({ tool: selectedTool, file: image.file, options: selectedOptions } as ProcessRequest),
     retry: (failureCount, error) => isApiError(error) && error.retryable && failureCount < MAX_RETRIES,
-    // Keep the previous preview on screen while new settings load, but only for the same tool.
-    placeholderData: (previous, previousQuery) =>
-      previousQuery?.queryKey[3] === tool ? keepPreviousData(previous) : undefined,
   });
 
-  const error = query.error instanceof ApiError ? query.error : query.error ? new ApiError("UNKNOWN", "Processing failed.") : null;
+  const abortRef = useRef<AbortController | null>(null);
+  useEffect(() => () => abortRef.current?.abort(), []);
+
+  const currentFingerprint = source ? fingerprint(source, tool, options) : null;
+  const matchesCurrent = Boolean(currentFingerprint && mutation.variables?.fingerprint === currentFingerprint);
+
+  // Stop work for a previous image or settings snapshot when the editor changes.
+  useEffect(() => {
+    if (mutation.isPending && mutation.variables?.fingerprint !== currentFingerprint) {
+      abortRef.current?.abort();
+    }
+  }, [currentFingerprint, mutation.isPending, mutation.variables?.fingerprint]);
+  const result = matchesCurrent ? mutation.data : undefined;
+  const error = matchesCurrent && mutation.error instanceof ApiError
+    ? mutation.error
+    : matchesCurrent && mutation.error
+      ? new ApiError("UNKNOWN", "Processing failed.")
+      : null;
+
+  const process = () => {
+    if (!source || !validation.valid) return;
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+    mutation.mutate({
+      source,
+      tool,
+      options: structuredClone(options),
+      fingerprint: currentFingerprint!,
+      signal: controller.signal,
+    });
+  };
+
+  const retry = () => {
+    if (mutation.variables) mutation.mutate(mutation.variables);
+  };
 
   return {
-    result: query.data,
-    isProcessing: query.isFetching || isSettling,
-    isUpdating: query.isPlaceholderData || (isSettling && Boolean(query.data)),
-    error: query.isError ? error : null,
+    result,
+    isProcessing: matchesCurrent && mutation.isPending,
+    error: mutation.isError ? error : null,
     validationMessage: validation.valid ? null : validation.message,
-    retry: () => void query.refetch(),
+    process,
+    retry,
   };
 }

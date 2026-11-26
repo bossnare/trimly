@@ -5,10 +5,12 @@ import { useProcessing } from "../../state/processing-context";
 import { EmptyStage } from "./empty-stage";
 import { ErrorStage } from "./error-stage";
 import { ProcessingStage } from "./processing-stage";
+import { ReadyStage } from "./ready-stage";
 import { ResultStage } from "./result-stage";
 
 const VIEWS = {
   empty: EmptyStage,
+  ready: ReadyStage,
   processing: ProcessingStage,
   result: ResultStage,
   error: ErrorStage,
